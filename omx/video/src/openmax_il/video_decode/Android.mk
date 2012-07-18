@@ -10,7 +10,7 @@ LOCAL_SRC_FILES:= \
 	src/OMX_VideoDecoder.c
 
 LOCAL_C_INCLUDES := $(TI_OMX_COMP_C_INCLUDES) \
-	$(TI_OMX_VIDEO)/video_decode/inc \
+	$(TI_OMX_VIDEO)/video_decode/inc
 	
 
 ifeq ($(PERF_INSTRUMENTATION),1)
@@ -26,10 +26,11 @@ LOCAL_SHARED_LIBRARIES += \
 endif
 
 LOCAL_LDLIBS += \
-	-lpthread \
+	-lpthread
 
 LOCAL_CFLAGS := $(TI_OMX_CFLAGS) -DANDROID -DOMAP_2430
 
 LOCAL_MODULE:= libOMX.TI.Video.Decoder
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)

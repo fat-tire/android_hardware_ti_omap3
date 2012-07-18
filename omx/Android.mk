@@ -114,8 +114,8 @@ include $(TI_OMX_AUDIO)/g729_enc/src/Android.mk
 include $(TI_OMX_AUDIO)/g729_enc/tests/Android.mk
 #call to video
 include $(TI_OMX_VIDEO)/video_decode/Android.mk
-include $(TI_OMX_VIDEO)/video_encode/Android.mk
-include $(TI_OMX_VIDEO)/video_encode/test/Android.mk
+#include $(TI_OMX_VIDEO)/video_encode/Android.mk
+#include $(TI_OMX_VIDEO)/video_encode/test/Android.mk
 include $(TI_OMX_VIDEO)/prepost_processor/Android.mk
 
 #call to image

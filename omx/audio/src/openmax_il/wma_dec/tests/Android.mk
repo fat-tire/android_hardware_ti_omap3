@@ -6,7 +6,7 @@ include $(CLEAR_VARS)
 
 
 LOCAL_SRC_FILES:= \
-	WmaDecTest.c \
+	WmaDecTest.c
 	
 LOCAL_C_INCLUDES := \
 	$(TI_OMX_AUDIO)/wma_dec/inc \
@@ -18,6 +18,7 @@ LOCAL_SHARED_LIBRARIES := $(TI_OMX_COMP_SHARED_LIBRARIES)
 LOCAL_CFLAGS := $(TI_OMX_CFLAGS) -DOMX_DEBUG
 
 LOCAL_MODULE:= WmaDecTest_common
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_EXECUTABLE)
 endif
