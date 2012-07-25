@@ -168,7 +168,7 @@ OMX_ERRORTYPE TIOMX_Init()
     }
 
     count++;
-    LOGD("init count = %d\n", count);
+    ALOGD("init count = %d\n", count);
 
     if (count == 1)
     {
@@ -304,7 +304,7 @@ OMX_ERRORTYPE TIOMX_GetHandle( OMX_HANDLETYPE* pHandle, OMX_STRING cComponentNam
                     ALOGE("%d:: malloc of pHandle* failed\n", __LINE__);
                     goto CLEAN_UP;
                 }
-                LOGD("Found component %s with refCount %d  pHandle (%p)\n",
+                ALOGD("Found component %s with refCount %d  pHandle (%p)\n",
                         cComponentName, componentTable[refIndex].refCount, *pHandle);
 
                 pComponents[i] = *pHandle;
@@ -406,7 +406,7 @@ OMX_ERRORTYPE TIOMX_FreeHandle (OMX_HANDLETYPE hComponent)
         for (handleIndex=0; handleIndex < componentTable[refIndex].refCount; handleIndex++){
             /* get the position for the component in the table */
             if (componentTable[refIndex].pHandle[handleIndex] == hComponent){
-                LOGD("Found matching pHandle(%p) at index %d with refCount %d",
+                ALOGD("Found matching pHandle(%p) at index %d with refCount %d",
                       hComponent, refIndex, componentTable[refIndex].refCount);
                 if (componentTable[refIndex].refCount > 1) {
                     /*There is more than one instance of the same component. The
@@ -483,7 +483,7 @@ OMX_ERRORTYPE TIOMX_Deinit()
         count--;
     }
 
-    LOGD("deinit count = %d\n", count);
+    ALOGD("deinit count = %d\n", count);
 
     if(pthread_mutex_unlock(&mutex) != 0) {
         ALOGE("%d :: Core: Error in Mutex unlock\n",__LINE__);

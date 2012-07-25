@@ -60,7 +60,7 @@
 
 #ifdef  PM_DEBUG
   #ifdef ANDROID
-    #define PM_DPRINT LOGD
+    #define PM_DPRINT ALOGD
     #undef LOG_TAG
     #define LOG_TAG "OMX Policy Manager"
     #include <utils/Log.h>

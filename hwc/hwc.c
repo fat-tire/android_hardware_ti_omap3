@@ -152,7 +152,7 @@ static int tv_enabled = 0;
 
 static void dump_layer(hwc_layer_t const* l)
 {
-    LOGD("\ttype=%d, flags=%08x, handle=%p, tr=%02x, blend=%04x, {%d,%d,%d,%d}, {%d,%d,%d,%d}",
+    ALOGD("\ttype=%d, flags=%08x, handle=%p, tr=%02x, blend=%04x, {%d,%d,%d,%d}, {%d,%d,%d,%d}",
             l->compositionType, l->flags, l->handle, l->transform, l->blending,
             l->sourceCrop.left,
             l->sourceCrop.top,
@@ -168,7 +168,7 @@ static void dump_dsscomp(struct dsscomp_setup_dispc_data *d)
 {
     unsigned i;
 
-    LOGD("[%08x] set: %c%c%c %d ovls\n",
+    ALOGD("[%08x] set: %c%c%c %d ovls\n",
          d->sync_id,
          (d->mode & DSSCOMP_SETUP_MODE_APPLY) ? 'A' : '-',
          (d->mode & DSSCOMP_SETUP_MODE_DISPLAY) ? 'D' : '-',
@@ -177,7 +177,7 @@ static void dump_dsscomp(struct dsscomp_setup_dispc_data *d)
 
     for (i = 0; i < d->num_mgrs; i++) {
         struct dss2_mgr_info *mi = d->mgrs + i;
-        LOGD(" (dis%d alpha=%d col=%08x ilace=%d)\n",
+        ALOGD(" (dis%d alpha=%d col=%08x ilace=%d)\n",
             mi->ix,
             mi->alpha_blending, mi->default_color,
             mi->interlaced);
@@ -770,9 +770,9 @@ static int omap3_hwc_set_best_hdmi_mode(omap3_hwc_device_t *hwc_dev, __u32 xres,
         /* pick highest frame rate */
         score = (score << 8) | d.modedb[i].refresh;
 
-        LOGD("#%d: %dx%d %dHz", i, d.modedb[i].xres, d.modedb[i].yres, d.modedb[i].refresh);
+        ALOGD("#%d: %dx%d %dHz", i, d.modedb[i].xres, d.modedb[i].yres, d.modedb[i].refresh);
         if (debug)
-            LOGD("  score=%u adj.res=%dx%d", score, ext_fb_xres, ext_fb_yres);
+            ALOGD("  score=%u adj.res=%dx%d", score, ext_fb_xres, ext_fb_yres);
         if (best_score < score) {
             ext->width = ext_width;
             ext->height = ext_height;
@@ -785,7 +785,7 @@ static int omap3_hwc_set_best_hdmi_mode(omap3_hwc_device_t *hwc_dev, __u32 xres,
     if (~best) {
         struct dsscomp_setup_display_data sdis = { .ix = 1, };
         sdis.mode = d.dis.modedb[best];
-        LOGD("picking #%d", best);
+        ALOGD("picking #%d", best);
         /* only reconfigure on change */
         if (ext->last_mode != ~best)
             ioctl(hwc_dev->dsscomp_fd, DSSCIOC_SETUP_DISPLAY, &sdis);
@@ -1007,7 +1007,7 @@ static int omap3_hwc_prepare(struct hwc_composer_device *dev, hwc_layer_list_t* 
     }
   
     if (debug) {
-        LOGD("prepare (%d) - %s (comp=%d, poss=%d/%d scaled, RGB=%d,BGR=%d,NV12=%d) (ext=%s%s%ddeg%s %dex/%dmx (last %dex,%din)\n",
+        ALOGD("prepare (%d) - %s (comp=%d, poss=%d/%d scaled, RGB=%d,BGR=%d,NV12=%d) (ext=%s%s%ddeg%s %dex/%dmx (last %dex,%din)\n",
              dsscomp->sync_id,
              hwc_dev->use_sgx ? "SGX+OVL" : "all-OVL",
              num.composited_layers,
@@ -1184,7 +1184,7 @@ static int omap3_hwc_prepare(struct hwc_composer_device *dev, hwc_layer_list_t* 
                     yres != hwc_dev->ext.last_yres_used ||
                     xpy < hwc_dev->ext.last_xpy * (1.f - ASPECT_RATIO_TOLERANCE) ||
                     xpy * (1.f - ASPECT_RATIO_TOLERANCE) > hwc_dev->ext.last_xpy) {
-                    LOGD("set up HDMI for %d*%d\n", xres, yres);
+                    ALOGD("set up HDMI for %d*%d\n", xres, yres);
                     if (omap3_hwc_set_best_hdmi_mode(hwc_dev, xres, yres, xpy)) {
                         o->cfg.enabled = 0;
                         hwc_dev->ext.current.enabled = 0;
@@ -1337,7 +1337,7 @@ static int omap3_hwc_set(struct hwc_composer_device *dev, hwc_display_t dpy,
     }
     e -= snprintf(end - e, e, "}%s\n", hwc_dev->use_sgx ? " swap" : "");
     if (debug) {
-        LOGD("%s", big_log);
+        ALOGD("%s", big_log);
     }
 
     // LOGD("set %d layers (sgx=%d)\n", dsscomp->num_ovls, hwc_dev->use_sgx);
