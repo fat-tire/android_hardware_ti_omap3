@@ -187,10 +187,10 @@ static void dump_dsscomp(struct dsscomp_setup_dispc_data *d)
             struct dss2_ovl_info *oi = d->ovls + i;
             struct dss2_ovl_cfg *c = &oi->cfg;
             if (c->zonly)
-                    LOGE("ovl%d(%s z%d)\n",
+                    ALOGE("ovl%d(%s z%d)\n",
                          c->ix, c->enabled ? "ON" : "off", c->zorder);
             else
-                    LOGE("ovl%d(%s z%d %x%s *%d%% %d*%d:%d,%d+%d,%d rot%d%s => %d,%d+%d,%d %p/%p|%d)\n",
+                    ALOGE("ovl%d(%s z%d %x%s *%d%% %d*%d:%d,%d+%d,%d rot%d%s => %d,%d+%d,%d %p/%p|%d)\n",
                          c->ix, c->enabled ? "ON" : "off", c->zorder, c->color_mode,
                          c->pre_mult_alpha ? " premult" : "",
                          (c->global_alpha * 100 + 128) / 255,
@@ -311,7 +311,7 @@ omap3_hwc_setup_layer_base(struct dss2_ovl_cfg *oc, int index, int format, int b
 
     default:
         /* Should have been filtered out */
-        LOGV("Unsupported pixel format");
+        ALOGV("Unsupported pixel format");
         return;
     }
 
@@ -802,7 +802,7 @@ static int omap3_hwc_set_best_hdmi_mode(omap3_hwc_device_t *hwc_dev, __u32 xres,
             !omap3_hwc_can_scale(xres, yres, ext_fb_xres, ext_fb_yres,
                                  1, &d.dis, &limits,
                                  d.dis.timings.pixel_clock)) {
-            LOGE("DSS scaler cannot support HDMI cloning");
+            ALOGE("DSS scaler cannot support HDMI cloning");
             return -1;
         }
     }
@@ -1115,7 +1115,7 @@ static int omap3_hwc_prepare(struct hwc_composer_device *dev, hwc_layer_list_t* 
         /* assign a z-layer for fb */
         if (fb_z < 0) {
             if (num.composited_layers)
-                LOGE("**** should have assigned z-layer for fb");
+                ALOGE("**** should have assigned z-layer for fb");
             fb_z = z++;
         }
 
@@ -1207,16 +1207,16 @@ static int omap3_hwc_prepare(struct hwc_composer_device *dev, hwc_layer_list_t* 
     hwc_dev->ext.last = hwc_dev->ext.current;
 
     if (z != dsscomp->num_ovls || dsscomp->num_ovls > MAX_HW_OVERLAYS)
-        LOGE("**** used %d z-layers for %d overlays\n", z, dsscomp->num_ovls);
+        ALOGE("**** used %d z-layers for %d overlays\n", z, dsscomp->num_ovls);
 
     /* verify all z-orders and overlay indices are distinct */
     for (i = z = ix = 0; i < dsscomp->num_ovls; i++) {
         struct dss2_ovl_cfg *c = &dsscomp->ovls[i].cfg;
 
         if (z & (1 << c->zorder))
-            LOGE("**** used z-order #%d multiple times", c->zorder);
+            ALOGE("**** used z-order #%d multiple times", c->zorder);
         if (ix & (1 << c->ix))
-            LOGE("**** used ovl index #%d multiple times", c->ix);
+            ALOGE("**** used ovl index #%d multiple times", c->ix);
         z |= 1 << c->zorder;
         ix |= 1 << c->ix;
     }
@@ -1253,18 +1253,18 @@ static void omap3_hwc_reset_screen(omap3_hwc_device_t *hwc_dev)
         /* remove bootloader image from the screen as blank/unblank does not change the composition */
         ret = ioctl(hwc_dev->dsscomp_fd, DSSCIOC_SETUP_DISPC, &d);
         if (ret)
-            LOGW("failed to remove bootloader image");
+            ALOGW("failed to remove bootloader image");
 
         /* blank and unblank fd to make sure display is properly programmed on boot.
          * This is needed because the bootloader can not be trusted.
          */
         ret = ioctl(hwc_dev->fb_fd, FBIOBLANK, FB_BLANK_POWERDOWN);
         if (ret)
-            LOGW("failed to blank display");
+            ALOGW("failed to blank display");
 
         ret = ioctl(hwc_dev->fb_fd, FBIOBLANK, FB_BLANK_UNBLANK);
         if (ret)
-            LOGW("failed to blank display");
+            ALOGW("failed to blank display");
     }
 }
 
@@ -1349,7 +1349,7 @@ static int omap3_hwc_set(struct hwc_composer_device *dev, hwc_display_t dpy,
 
         if (hwc_dev->use_sgx) {
             if (!eglSwapBuffers((EGLDisplay)dpy, (EGLSurface)sur)) {
-                LOGE("eglSwapBuffers error");
+                ALOGE("eglSwapBuffers error");
                 err = HWC_EGL_ERROR;
                 goto err_out;
             }
@@ -1372,7 +1372,7 @@ static int omap3_hwc_set(struct hwc_composer_device *dev, hwc_display_t dpy,
             __u32 crt = 0;
             int err2 = ioctl(hwc_dev->fb_fd, FBIO_WAITFORVSYNC, &crt);
             if (err2) {
-                LOGE("failed to wait for vsync (%d)", errno);
+                ALOGE("failed to wait for vsync (%d)", errno);
                 err = err ? : -errno;
             }
         }
@@ -1380,7 +1380,7 @@ static int omap3_hwc_set(struct hwc_composer_device *dev, hwc_display_t dpy,
     hwc_dev->last_ext_ovls = hwc_dev->ext_ovls;
     hwc_dev->last_int_ovls = hwc_dev->post2_layers;
     if (err)
-        LOGE("Post2 error");
+        ALOGE("Post2 error");
 
 err_out:
     pthread_mutex_unlock(&hwc_dev->lock);
@@ -1477,7 +1477,7 @@ static int omap3_hwc_open_fb_hal(IMG_framebuffer_device_public_t **fb_dev)
     return 0;
 
 err_out:
-    LOGE("Composer HAL failed to load compatible Graphics HAL");
+    ALOGE("Composer HAL failed to load compatible Graphics HAL");
     return err;
 }
 
@@ -1489,39 +1489,38 @@ static void handle_hotplug(omap3_hwc_device_t *hwc_dev, int state)
     ext->dock.enabled = ext->mirror.enabled = 0;
 
     if (state == 1) { /* hdmi panel enable */
-	hdmi_enabled = 1;
-	tv_enabled = 0;
-
-	system("echo 0 >" "/sys/devices/platform/dsscomp/isprsz/enable");
-	system("echo 0 >" "/sys/devices/platform/omapdss/display1/enabled");
-	system("echo 0 >" "/sys/devices/platform/omapdss/overlay0/enabled");
-	system("echo 0 >" "/sys/devices/platform/omapdss/display0/enabled");
-	system("echo hdmi >" "/sys/devices/platform/omapdss/manager0/display");
-	system("echo 1 >" "/sys/devices/platform/omapdss/display1/enabled");
-	system("echo 1 >" "/sys/devices/platform/omapdss/overlay0/enabled");
+    hdmi_enabled = 1;
+	 tv_enabled = 0;
+	 system("echo 0 >" "/sys/devices/platform/dsscomp/isprsz/enable");
+	 system("echo 0 >" "/sys/devices/platform/omapdss/display1/enabled");
+	 system("echo 0 >" "/sys/devices/platform/omapdss/overlay0/enabled");
+	 system("echo 0 >" "/sys/devices/platform/omapdss/display0/enabled");
+	 system("echo hdmi >" "/sys/devices/platform/omapdss/manager0/display");
+	 system("echo 1 >" "/sys/devices/platform/omapdss/display1/enabled");
+	 system("echo 1 >" "/sys/devices/platform/omapdss/overlay0/enabled");
     } else if(state == 2) { /* tv-out enable */
-	hdmi_enabled = 0;
-	tv_enabled = 1;
-	system("echo 0 >" "/sys/devices/platform/omapdss/overlay1/enabled");
-	system("echo tv >" "/sys/devices/platform/omapdss/overlay1/manager");
-	system("echo 1 >" "/sys/devices/platform/omapdss/overlay1/enabled");
-	system("echo 1 >" "/sys/devices/platform/omapdss/display2/enabled");
+	 hdmi_enabled = 0;
+	 tv_enabled = 1;
+	 system("echo 0 >" "/sys/devices/platform/omapdss/overlay1/enabled");
+	 system("echo tv >" "/sys/devices/platform/omapdss/overlay1/manager");
+	 system("echo 1 >" "/sys/devices/platform/omapdss/overlay1/enabled");
+	 system("echo 1 >" "/sys/devices/platform/omapdss/display2/enabled");
     } else { /* lcd enable */
-        hdmi_enabled = 0;
-        ext->last_mode = 0;
-	tv_enabled = 0;
+    hdmi_enabled = 0;
+    ext->last_mode = 0;
+	 tv_enabled = 0;
+    system("echo 1 >" "/sys/devices/platform/dsscomp/isprsz/enable");
+    system("echo 0 >" "/sys/devices/platform/omapdss/display1/enabled");
+    system("echo 0 >" "/sys/devices/platform/omapdss/overlay0/enabled");
+	 system("echo 0 >" "/sys/devices/platform/omapdss/overlay1/enabled");
+	 system("echo 800,450 >" "/sys/devices/platform/omapdss/overlay1/output_size");
+    system("echo lcd >" "/sys/devices/platform/omapdss/manager0/display");
+    system("echo 1 >" "/sys/devices/platform/omapdss/display0/enabled");
+	 system("echo 1 >" "/sys/devices/platform/omapdss/overlay1/enabled");
+    system("echo 1 >" "/sys/devices/platform/omapdss/overlay0/enabled");
 
-	system("echo 1 >" "/sys/devices/platform/dsscomp/isprsz/enable");
-        system("echo 0 >" "/sys/devices/platform/omapdss/display1/enabled");
-        system("echo 0 >" "/sys/devices/platform/omapdss/overlay0/enabled");
-	system("echo 0 >" "/sys/devices/platform/omapdss/overlay1/enabled");
-	system("echo 800,450 >" "/sys/devices/platform/omapdss/overlay1/output_size");
-        system("echo lcd >" "/sys/devices/platform/omapdss/manager0/display");
-        system("echo 1 >" "/sys/devices/platform/omapdss/display0/enabled");
-	system("echo 1 >" "/sys/devices/platform/omapdss/overlay1/enabled");
-        system("echo 1 >" "/sys/devices/platform/omapdss/overlay0/enabled");
+
     }
-
     omap3_hwc_create_ext_matrix(ext);
     LOGI("external display changed (state=%d, mirror={%s tform=%ddeg%s}, dock={%s tform=%ddeg%s}, tv=%d", state,
          ext->mirror.enabled ? "enabled" : "disabled",
@@ -1596,7 +1595,7 @@ static void *omap3_hwc_hdmi_thread(void *data)
 
         if (err == -1) {
             if (errno != EINTR)
-                LOGE("event error: %m");
+                ALOGE("event error: %m");
             continue;
         }
 
@@ -1642,7 +1641,7 @@ static int omap3_hwc_device_open(const hw_module_t* module, const char* name,
             return err;
 
         if (!hwc_mod->fb_dev) {
-            LOGE("Framebuffer HAL not opened before HWC");
+            ALOGE("Framebuffer HAL not opened before HWC");
             return -EFAULT;
         }
         hwc_mod->fb_dev->bBypassPost = 1;
@@ -1667,14 +1666,14 @@ static int omap3_hwc_device_open(const hw_module_t* module, const char* name,
 
     hwc_dev->dsscomp_fd = open("/dev/dsscomp", O_RDWR);
     if (hwc_dev->dsscomp_fd < 0) {
-        LOGE("failed to open dsscomp (%d)", errno);
+        ALOGE("failed to open dsscomp (%d)", errno);
         err = -errno;
         goto done;
     }
 #if 0 /*Currently commented hdmi fb fd*/
     hwc_dev->hdmi_fb_fd = open("/dev/graphics/fb1", O_RDWR);
     if (hwc_dev->hdmi_fb_fd < 0) {
-        LOGE("failed to open hdmi fb (%d)", errno);
+        ALOGE("failed to open hdmi fb (%d)", errno);
         err = -errno;
         goto done;
     }
@@ -1682,7 +1681,7 @@ static int omap3_hwc_device_open(const hw_module_t* module, const char* name,
 
     hwc_dev->fb_fd = open("/dev/graphics/fb0", O_RDWR);
     if (hwc_dev->fb_fd < 0) {
-        LOGE("failed to open fb (%d)", errno);
+        ALOGE("failed to open fb (%d)", errno);
         err = -errno;
         goto done;
     }
@@ -1695,26 +1694,26 @@ static int omap3_hwc_device_open(const hw_module_t* module, const char* name,
 
     int ret = ioctl(hwc_dev->dsscomp_fd, DSSCIOC_QUERY_DISPLAY, &hwc_dev->fb_dis);
     if (ret) {
-        LOGE("failed to get display info (%d): %m", errno);
+        ALOGE("failed to get display info (%d): %m", errno);
         err = -errno;
         goto done;
     }
 
     if (pipe(hwc_dev->pipe_fds) == -1) {
-            LOGE("failed to event pipe (%d): %m", errno);
+            ALOGE("failed to event pipe (%d): %m", errno);
             err = -errno;
             goto done;
     }
 
     if (pthread_mutex_init(&hwc_dev->lock, NULL)) {
-            LOGE("failed to create mutex (%d): %m", errno);
+            ALOGE("failed to create mutex (%d): %m", errno);
             err = -errno;
             goto done;
     }
 
     if (pthread_create(&hwc_dev->hdmi_thread, NULL, omap3_hwc_hdmi_thread, hwc_dev))
     {
-            LOGE("failed to create HDMI listening thread (%d): %m", errno);
+            ALOGE("failed to create HDMI listening thread (%d): %m", errno);
             err = -errno;
             goto done;
     }
@@ -1756,7 +1755,7 @@ static int omap3_hwc_device_open(const hw_module_t* module, const char* name,
     }
     handle_hotplug(hwc_dev, hpd);
 
-    LOGE("omap3_hwc_device_open(rgb_order=%d nv12_only=%d)",
+    ALOGE("omap3_hwc_device_open(rgb_order=%d nv12_only=%d)",
         hwc_dev->flags_rgb_order, hwc_dev->flags_nv12_only);
 
 done:
