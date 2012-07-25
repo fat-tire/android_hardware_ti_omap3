@@ -15,7 +15,8 @@ LOCAL_SHARED_LIBRARIES := \
 	
 LOCAL_CFLAGS += -Wall -g -O2 -finline-functions -DOMAP_3430
 
-LOCAL_MODULE:= cexec.out
+# change to dspexec for compatibility reasons - why did you rename this, TI?!
+LOCAL_MODULE:= dspexec
 LOCAL_MODULE_TAGS:= optional
 
 include $(BUILD_EXECUTABLE)
