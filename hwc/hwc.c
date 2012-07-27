@@ -1522,7 +1522,7 @@ static void handle_hotplug(omap3_hwc_device_t *hwc_dev, int state)
 
     }
     omap3_hwc_create_ext_matrix(ext);
-    LOGI("external display changed (state=%d, mirror={%s tform=%ddeg%s}, dock={%s tform=%ddeg%s}, tv=%d", state,
+    ALOGI("external display changed (state=%d, mirror={%s tform=%ddeg%s}, dock={%s tform=%ddeg%s}, tv=%d", state,
          ext->mirror.enabled ? "enabled" : "disabled",
          ext->mirror.rotation * 90,
          ext->mirror.hflip ? "+hflip" : "",
@@ -1740,7 +1740,7 @@ static int omap3_hwc_device_open(const hw_module_t* module, const char* name,
         struct hwc_rect fb_region = { .right = hwc_dev->fb_dev->base.width, .bottom = hwc_dev->fb_dev->base.height };
         hwc_dev->ext.mirror_region = fb_region;
     }
-    LOGI("clone region is set to (%d,%d) to (%d,%d)",
+    ALOGI("clone region is set to (%d,%d) to (%d,%d)",
          hwc_dev->ext.mirror_region.left, hwc_dev->ext.mirror_region.top,
          hwc_dev->ext.mirror_region.right, hwc_dev->ext.mirror_region.bottom);
 
